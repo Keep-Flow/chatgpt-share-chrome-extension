@@ -4,7 +4,7 @@
   "version": "1.0",
   "description": "ChatGPT Share Quickly",
   "browser_action": {
-    "default_icon": "./assets/icon.png",
+    "default_icon": "./static/icon.png",
     "default_popup": "./src/popup/popup.html"
   },
   "permissions": ["tabs", "contextMenus", "webRequest"],
@@ -13,10 +13,13 @@
       "matches": ["https://chat.openai.com/*"],
       "js": [
         "./src/utils/html2canvas.min.js",
+        "./src/utils/debounce.js",
+        "./src/chat-page/installCheckbox.js",
         "./src/chat-page/exportImg.js",
         "./src/chat-page/exportLink.js",
         "./src/chat-page/index.js"
-      ]
+      ],
+      "css": ["./src/chat-page/index.css"]
     }
   ]
 }
