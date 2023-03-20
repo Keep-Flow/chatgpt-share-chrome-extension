@@ -7,6 +7,7 @@ const installButtons = () => {
     '.flex.ml-1.md\\:w-full.md\\:m-auto.md\\:mb-2.gap-0.md\\:gap-2.justify-center'
   )
   installShareImgButton(container)
+  installShareJsonButton(container)
   installShareLinkButton(container)
   installShareCheckboxButton()
 }

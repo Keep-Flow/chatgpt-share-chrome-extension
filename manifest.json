@@ -16,6 +16,7 @@
         "./src/utils/debounce.js",
         "./src/chat-page/installCheckbox.js",
         "./src/chat-page/exportImg.js",
+        "./src/chat-page/exportJson.js",
         "./src/chat-page/exportLink.js",
         "./src/chat-page/index.js"
       ],
