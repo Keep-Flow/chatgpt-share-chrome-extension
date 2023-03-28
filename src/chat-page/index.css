@@ -1,5 +1,24 @@
-#checkbox-button {
+#show-checkbox-button {
   position: fixed;
   right: 10px;
   top: 10px;
+}
+
+.select-all-checkbox {
+  position: fixed;
+  right: 100px;
+  top: 15px;
+}
+
+.share-checkbox-all,
+.share-checkbox {
+  display: none !important;
+}
+
+.share-checkbox + label {
+  filter: brightness(0.5);
+}
+
+.share-checkbox:checked + label {
+  filter: brightness(1);
 }

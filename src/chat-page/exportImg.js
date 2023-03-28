@@ -25,7 +25,7 @@ const downloadImage = (canvas, fileName) => {
  * 将全文转换为图片
  */
 const generateAll2Img = () => {
-  const checkedNodes = document.querySelector('.share-checkbox-all')
+  const checkedNodes = document.querySelector(`.${SELECT_ALL_CHECKBOX}`)
   if (checkedNodes) removeCheckboxesFromNodes()
 
   const targetNode = document.querySelector(
@@ -41,9 +41,6 @@ const generateAll2Img = () => {
  * 将勾选的区域转换为图片
  */
 const generateChecked2Img = async () => {
-  const checkboxAll = document.querySelector('.share-checkbox-all')
-  const checkboxes = document.querySelectorAll('.share-checkbox:checked')
-
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
   let totalHeight = 0
@@ -68,13 +65,15 @@ const generateChecked2Img = async () => {
     }
   }
 
-  // Header
-  checkboxAll.style.display = 'none'
-  await processNode(checkboxAll.parentElement)
+  hideShareCheckboxButton()
 
-  for (const [index, checkbox] of checkboxes.entries()) {
-    checkbox.style.display = 'none'
-    await processNode(checkbox.parentElement)
+  const header = getHeaderNode()
+  await processNode(header)
+
+  const checkboxes = getCheckedChatNodes()
+
+  for (const checkbox of checkboxes) {
+    await processNode(checkbox)
   }
 
   drawNodeCanvases()
