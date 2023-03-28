@@ -12,7 +12,7 @@ const convertContentToJson = (dom) => {
     children: [],
   }
 
-  if (tag === 'PRE') {
+  if (json.tag === 'PRE') {
     const code = dom.querySelector('code')
     const language =
       Array.from(code.classList)
@@ -21,27 +21,22 @@ const convertContentToJson = (dom) => {
     const text = code?.textContent || ''
     const codeText = '```' + language + '\n' + text + '```'
 
-    text = codeText
+    json.text = codeText
     delete json.children
     return json
   }
 
   for (const child of dom.children) {
     json.children.push(convertContentToJson(child))
-    if (!json.children.length) delete json.children
   }
 
+  if (!json.children.length) delete json.children
   return json
 }
 
 // 定义一个函数，将 DOM 节点转换为 JSON 对象
 const convertDomToJson = (dom) => {
-  const checkboxes = dom.querySelectorAll('.share-checkbox:checked')
-  const checkedChats = checkboxes.map(
-    (checkbox) => checkbox.parentElement
-  )
-
-  if (!checkedChats.length) checkedChats = dom.getElementsByClassName('group')
+  const checkedChats = getCheckedChatNodes()
 
   const conversation = []
 
@@ -50,24 +45,33 @@ const convertDomToJson = (dom) => {
       ? 'question'
       : 'answer'
 
-    const contentEl = singleChat.querySelector('.min-h-\\[20px\\]')
+    let info = { type }
 
-    console.log('contentEl', contentEl)
+    const contentEl = singleChat.querySelector('.min-h-\\[20px\\]')
+    if (!contentEl) continue
 
     // 分内容类型
-    let children
-
     if (type === 'question') {
-      children = contentEl.innerText
+      const avatarEl = singleChat.querySelector('.w-\\[30px\\] img.rounded-sm')
+      const userName = avatarEl?.alt || 'User'
+      // NOTE this src maybe need permission
+      const avatar = avatarEl?.src || ''
+
+      conversation.push({
+        author: userName,
+        avatar,
+        type,
+        text: contentEl.innerText,
+      })
     } else {
       const markdownEl = contentEl.querySelector('.markdown')
-      children = convertContentToJson(markdownEl).children
+      const children = convertContentToJson(markdownEl).children
+      conversation.push({
+        author: 'ChatGPT',
+        type,
+        children,
+      })
     }
-
-    conversation.push({
-      type,
-      children,
-    })
   }
 
   return conversation

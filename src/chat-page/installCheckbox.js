@@ -1,7 +1,6 @@
 const CONTROL_CHECKBOX_BUTTON_ID = 'show-checkbox-button' // 开启选择按钮
 const SELECT_ALL_CHECKBOX = 'select-all-checkbox' // 全选按钮
 
-
 /**
  * 创建一个复选框元素
  * @param {string} type - input类型
@@ -111,7 +110,7 @@ const removeCheckboxesFromNodes = () => {
  * @description 创建生成复选框按钮
  * @returns
  */
-const createCheckboxButton = () => {
+const createControlCheckboxButton = () => {
   const button = document.createElement('button')
   button.id = CONTROL_CHECKBOX_BUTTON_ID
   button.className = 'btn relative btn-neutral border-0 md:border'
@@ -121,7 +120,7 @@ const createCheckboxButton = () => {
   return button
 }
 
-const listenCheckboxButton = (button) => {
+const listenControlCheckboxButton = (button) => {
   button.addEventListener('click', () => {
     const checkboxAll = document.querySelector(`.${SELECT_ALL_CHECKBOX}`)
     if (checkboxAll) removeCheckboxesFromNodes()
@@ -132,8 +131,8 @@ const listenCheckboxButton = (button) => {
 // 安装复选框按钮
 const installShareCheckboxButton = () => {
   if (document.getElementById(CONTROL_CHECKBOX_BUTTON_ID)) return
-  const button = createCheckboxButton()
-  listenCheckboxButton(button)
+  const button = createControlCheckboxButton()
+  listenControlCheckboxButton(button)
   document.body.appendChild(button)
 }
 
@@ -159,6 +158,11 @@ const getHeaderNode = () => {
 // 计算选中的聊天节点
 const getCheckedChatNodes = () => {
   const checkboxes = document.querySelectorAll('.share-checkbox:checked')
+
+  if (!checkboxes.length) {
+    return document.querySelectorAll('main .group')
+  }
+  
   const chatNodes = []
   checkboxes.forEach((checkbox) => {
     const label = checkbox.nextSibling
