@@ -96,11 +96,8 @@ const export2Json = () => {
   const conversationWrapper = document.querySelector(
     '.flex.flex-col.items-center.text-sm.dark\\:bg-gray-800'
   )
-
   const json = convertDomToJson(conversationWrapper)
-  console.log(json)
-
-  // saveJson(json, 'chats.json')
+  saveJson(json, 'chats.json')
 }
 
 const createJsonButton = () => {
