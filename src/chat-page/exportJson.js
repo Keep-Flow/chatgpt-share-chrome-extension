@@ -97,6 +97,8 @@ const export2Json = () => {
     '.flex.flex-col.items-center.text-sm.dark\\:bg-gray-800'
   )
   const json = convertDomToJson(conversationWrapper)
+  removeCheckboxesFromNodes()
+  console.log('Share Chats JSON:', json)
   saveJson(json, 'chats.json')
 }
 
