@@ -1,12 +1,20 @@
-/**
- * 使用深度优先搜索
- * 将 DOM 节点转换为 JSON 对象
- * 包含 tag / text / children 字段
- * @param {HTMLElement} dom
- * @returns {JSON}
- */
-const convertContentToJson = (dom) => {
-  const json = {
+interface JsonNode {
+  tag: string
+  text?: string
+  children?: JsonNode[]
+}
+
+interface Conversation {
+  author: string
+  type: string
+  avatar?: string
+  text?: string
+  children?: JsonNode[]
+}
+
+// 使用深度优先搜索将 DOM 节点转换为 JSON 对象
+const convertContentToJson = (dom: HTMLElement): JsonNode => {
+  const json: JsonNode = {
     tag: dom.tagName,
     text: dom.innerText,
     children: [],
@@ -15,7 +23,7 @@ const convertContentToJson = (dom) => {
   if (json.tag === 'PRE') {
     const code = dom.querySelector('code')
     const language =
-      Array.from(code.classList)
+      Array.from(code?.classList || [])
         .find((item) => item.startsWith('language-'))
         ?.replace('language-', '') || ''
     const text = code?.textContent || ''
@@ -26,33 +34,34 @@ const convertContentToJson = (dom) => {
     return json
   }
 
-  for (const child of dom.children) {
-    json.children.push(convertContentToJson(child))
+  for (const child of Array.from(dom.children)) {
+    if (child instanceof HTMLElement) {
+      json.children?.push(convertContentToJson(child));
+    }
   }
 
-  if (!json.children.length) delete json.children
-  return json
+  if (!json.children || !json.children.length) delete json.children;
+  return json;
 }
 
 // 定义一个函数，将 DOM 节点转换为 JSON 对象
-const convertDomToJson = (dom) => {
+const convertDomToJson = (): Conversation[] => {
   const checkedChats = getCheckedChatNodes()
-
-  const conversation = []
+  const conversation: Conversation[] = []
 
   for (const singleChat of checkedChats) {
     const type = singleChat.classList.contains('dark:bg-gray-800')
       ? 'question'
       : 'answer'
 
-    let info = { type }
-
-    const contentEl = singleChat.querySelector('.min-h-\\[20px\\]')
-    if (!contentEl) continue
+      const contentEl = singleChat.querySelector('.min-h-\\[20px\\]');
+      if (!contentEl || !(contentEl instanceof HTMLElement)) continue;
 
     // 分内容类型
     if (type === 'question') {
-      const avatarEl = singleChat.querySelector('.w-\\[30px\\] img.rounded-sm')
+      const avatarEl = singleChat.querySelector(
+        '.w-\\[30px\\] img.rounded-sm'
+      ) as HTMLImageElement
       const userName = avatarEl?.alt || 'User'
       // NOTE this src maybe need permission
       const avatar = avatarEl?.src || ''
@@ -64,13 +73,15 @@ const convertDomToJson = (dom) => {
         text: contentEl.innerText,
       })
     } else {
-      const markdownEl = contentEl.querySelector('.markdown')
-      const children = convertContentToJson(markdownEl).children
-      conversation.push({
-        author: 'ChatGPT',
-        type,
-        children,
-      })
+      const markdownEl = contentEl.querySelector('.markdown');
+      if (markdownEl && markdownEl instanceof HTMLElement) {
+        const children = convertContentToJson(markdownEl).children;
+        conversation.push({
+          author: 'ChatGPT',
+          type,
+          children,
+        });
+      }
     }
   }
 
@@ -78,7 +89,7 @@ const convertDomToJson = (dom) => {
 }
 
 // 保存 JSON 对象到本地
-const saveJson = (json, fileName) => {
+const saveJson = (json: object, fileName: string): void => {
   const jsonString = JSON.stringify(json)
   const blob = new Blob([jsonString], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
@@ -93,10 +104,7 @@ const saveJson = (json, fileName) => {
  * 将对话转换为 JSON
  */
 const export2Json = () => {
-  const conversationWrapper = document.querySelector(
-    '.flex.flex-col.items-center.text-sm.dark\\:bg-gray-800'
-  )
-  const json = convertDomToJson(conversationWrapper)
+  const json = convertDomToJson()
   removeCheckboxesFromNodes()
   console.log('Share Chats JSON:', json)
   saveJson(json, 'chats.json')
@@ -112,13 +120,13 @@ const createJsonButton = () => {
   return button
 }
 
-const listenJsonButton = (button) => {
+const listenJsonButton = (button: HTMLElement) => {
   button.addEventListener('click', () => {
     export2Json()
   })
 }
 
-const installShareJsonButton = (container) => {
+export const installShareJsonButton = (container: HTMLElement) => {
   if (document.getElementById('export-json-button')) return
   const button = createJsonButton()
   listenJsonButton(button)

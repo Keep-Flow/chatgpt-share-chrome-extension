@@ -8,13 +8,13 @@ const createLinkButton = () => {
   return button
 }
 
-const listenLinkButton = (button) => {
+const listenLinkButton = (button: HTMLElement) => {
   button.addEventListener('click', () => {
     alert('TODO Share Link')
   })
 }
 
-const installShareLinkButton = (container) => {
+export const installShareLinkButton = (container: HTMLElement) => {
   if (document.getElementById('export-link-button')) return
   const button = createLinkButton()
   listenLinkButton(button)

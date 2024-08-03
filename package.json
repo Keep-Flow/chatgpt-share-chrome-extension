@@ -1,0 +1,21 @@
+{
+  "name": "chatgpt-share",
+  "description": "A Chrome / Edge extension for sharing ChatGPT chat history",
+  "author": "RayJason",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.228",
+    "@types/html2canvas": "^1.0.0",
+    "@types/node": "^18.15.11",
+    "rollup-plugin-copy": "^3.4.0",
+    "typescript": "^5.0.3",
+    "vite": "^4.2.1"
+  },
+  "dependencies": {
+    "html2canvas": "^1.4.1"
+  }
+}

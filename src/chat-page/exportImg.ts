@@ -1,3 +1,10 @@
+import html2canvas from 'html2canvas'
+
+// 定义一个类型保护函数，确保节点是 HTMLElement
+function isHTMLElement(node: ChildNode | null): node is HTMLElement {
+  return node !== null && node.nodeType === Node.ELEMENT_NODE
+}
+
 const createImgButton = () => {
   const button = document.createElement('button')
   button.id = 'export-img-button'
@@ -10,10 +17,8 @@ const createImgButton = () => {
 
 /**
  * 保存图片
- * @param {string} dataUrl
- * @param {string} fileName 保存文件名
  */
-const downloadImage = (canvas, fileName) => {
+const downloadImage = (canvas: HTMLCanvasElement, fileName: string): void => {
   const dataUrl = canvas.toDataURL('image/png')
   const link = document.createElement('a')
   link.download = fileName
@@ -30,37 +35,42 @@ const generateAll2Img = () => {
 
   const targetNode = document.querySelector(
     '.flex.flex-col.items-center.text-sm.dark\\:bg-gray-800'
-  )
+  ) as HTMLElement
 
+  if (!targetNode) return
   html2canvas(targetNode).then((canvas) => {
     downloadImage(canvas, 'chats.png')
   })
 }
 
-/**
- * 将勾选的区域转换为图片
- */
-const generateChecked2Img = async () => {
+// 将选定的节点转换为图片
+const generateChecked2Img = async (): Promise<void> => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
   let totalHeight = 0
   let maxWidth = 0
-  const nodeCanvases = []
+  const nodeCanvases: HTMLCanvasElement[] = []
 
-  const processNode = async (node) => {
+  // 处理节点，生成对应的 canvas 并计算总高度和最大宽度
+  const processNode = async (node: ChildNode | null): Promise<void> => {
+    if (!isHTMLElement(node)) {
+      return
+    }
+
     const nodeCanvas = await html2canvas(node)
     nodeCanvases.push(nodeCanvas)
     totalHeight += nodeCanvas.height
     maxWidth = Math.max(maxWidth, nodeCanvas.width)
   }
 
-  const drawNodeCanvases = () => {
+  // 绘制节点 canvas 到主 canvas
+  const drawNodeCanvases = (): void => {
     canvas.width = maxWidth
     canvas.height = totalHeight
 
     let currentHeight = 0
     for (const nodeCanvas of nodeCanvases) {
-      ctx.drawImage(nodeCanvas, 0, currentHeight)
+      ctx?.drawImage(nodeCanvas, 0, currentHeight)
       currentHeight += nodeCanvas.height
     }
   }
@@ -81,7 +91,8 @@ const generateChecked2Img = async () => {
   removeCheckboxesFromNodes()
 }
 
-const listenImgButton = (button) => {
+// 为导出按钮添加点击事件监听
+const listenImgButton = (button: HTMLElement): void => {
   button.addEventListener('click', () => {
     const checked = document.querySelector('.share-checkbox:checked')
     if (checked) {
@@ -92,7 +103,8 @@ const listenImgButton = (button) => {
   })
 }
 
-const installShareImgButton = (container) => {
+// 安装导出图片按钮
+export const installShareImgButton = (container: HTMLElement | null): void => {
   if (document.getElementById('export-img-button')) return
   const button = createImgButton()
   listenImgButton(button)
